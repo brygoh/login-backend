@@ -20,6 +20,10 @@ const userSchema = new Schema({
     required: true,
     unique: false,
     trim: true,
+  },
+  token: {
+    type: String,
+    trim: true,
   }
 }, {
   timestamps: true,
