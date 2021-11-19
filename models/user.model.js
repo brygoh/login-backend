@@ -10,10 +10,10 @@ const userSchema = new Schema({
     trim: true,
   },
   name: {
-      type: String,
-      required: true,
-      unique: false,
-      trim: true,
+    type: String,
+    required: true,
+    unique: false,
+    trim: true,
   },
   role: {
     type: String,
@@ -21,10 +21,6 @@ const userSchema = new Schema({
     unique: false,
     trim: true,
   },
-  token: {
-    type: String,
-    trim: true,
-  }
 }, {
   timestamps: true,
 });

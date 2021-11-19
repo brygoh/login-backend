@@ -4,10 +4,56 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 // Normal route to get whole database
-router.route('/').get((req, res) => {
-  User.find()
-    .then(users => res.json(users))
-    .catch(err => res.status(400).json('Error: ' + err));
+router.route('/').get(async (req, res) => {
+  try {
+    let query = User.find();
+
+    const filter = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * pageSize;
+    const total = await User.countDocuments();
+    const pages = Math.ceil(total / pageSize);
+
+    if (page > pages) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No page found",
+      });
+    }
+
+    result = await query.skip(skip).limit(pageSize);
+    const filtered = result.filter(target => {
+      if (filter.filter === "") {
+        return target;
+      }
+      else if (target.name.toLowerCase().includes(filter.filter)){
+        return target;
+      }
+      else if (target.email.toLowerCase().includes(filter.filter)){
+          return target;
+      }
+    })
+    
+    res.json({
+      status: "success",
+      filter,
+      count: result.length,
+      page,
+      pages,
+      data: filtered
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      status: "error",
+      message: "Server Error",
+    });
+  }
+  
+  // User.find()
+  //   .then(users => res.json(users))
+  //   .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // Adding users to database
@@ -17,14 +63,6 @@ router.route('/add').post((req, res) => {
   const role = req.body.role;
 
   const newUser = new User({email, name, role});
-
-  const token = jwt.sign(
-    {data: req.body},
-    process.env.JWT_SECRET
-  )
-  newUser.token = token;
-
-  // res.cookie('jwt', token);
 
   newUser.save()
     .then(() => {
@@ -47,23 +85,24 @@ router.route('/:id').delete((req, res) => {
   //   }
   // })
 
-  User.findById(req.params.id)
-    .then(user => {
-      jwt.verify(user.token, process.env.JWT_SECRET, (err, decodedToken) => {
-        if (err) {
-          console.log(err.message);
-        }
-        else {
-          User.findByIdAndDelete(req.params.id)
-            .then(() => res.json('User deleted.'))
-            .catch(err => res.status(400).json('Error: ' + err));
-        }
-      })
-    })
-    .catch(err => res.status(400).json('Error: ' + err));
+  const verify = window.localStorage.getItem('authToken');
+
+  console.log(verify);
+
+  jwt.verify(verify, process.env.JWT_SECRET, (err, decodedToken) => {
+    if (err) {
+      console.log(err.message);
+    }
+    else {
+      User.findByIdAndDelete(req.params.id)
+        .then(() => res.json('User deleted.'))
+        .catch(err => res.status(400).json('Error: ' + err));
+    }
+  })
 });
 
 router.route('/update/:id').post((req, res) => {
+
   User.findById(req.params.id)
     .then(user => {
       user.email = req.body.email;
