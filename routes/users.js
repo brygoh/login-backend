@@ -22,8 +22,8 @@ router.route('/').get(async (req, res) => {
       });
     }
 
-    result = await query.skip(skip).limit(pageSize);
-    const filtered = result.filter(target => {
+    let result = await query;
+    let filtered = result.filter(target => {
       if (filter.filter === "") {
         return target;
       }
@@ -31,9 +31,9 @@ router.route('/').get(async (req, res) => {
         return target;
       }
       else if (target.email.toLowerCase().includes(filter.filter)){
-          return target;
+        return target;
       }
-    })
+    }).slice(skip, skip+pageSize);
     
     res.json({
       status: "success",
@@ -50,10 +50,6 @@ router.route('/').get(async (req, res) => {
       message: "Server Error",
     });
   }
-  
-  // User.find()
-  //   .then(users => res.json(users))
-  //   .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // Adding users to database
@@ -64,32 +60,26 @@ router.route('/add').post((req, res) => {
 
   const newUser = new User({email, name, role});
 
-  newUser.save()
-    .then(() => {
-      res.json(token); 
+  const token = req.body.token;
+  jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+    if (err) {
+      console.log(err.message);
+    }
+    else {
+      newUser.save()
+        .then(() => {
+          res.json(token); 
+      })
+        .catch(err => res.status(400).json('Error: ' + err));
+    }
   })
-    .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // Delete users from database
 router.route('/:id').delete((req, res) => {
 
-  // const token = req.cookies.jwt;
-  // console.log(token);
-  // jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
-  //   if (err) {
-  //     console.log(err.message);
-  //   }
-  //   else {
-  //     console.log(decodedToken);
-  //   }
-  // })
-
-  const verify = window.localStorage.getItem('authToken');
-
-  console.log(verify);
-
-  jwt.verify(verify, process.env.JWT_SECRET, (err, decodedToken) => {
+  const token = req.body.token;
+  jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
     if (err) {
       console.log(err.message);
     }
@@ -103,13 +93,15 @@ router.route('/:id').delete((req, res) => {
 
 router.route('/update/:id').post((req, res) => {
 
+  const token = req.body.token;
+
   User.findById(req.params.id)
     .then(user => {
       user.email = req.body.email;
       user.name = req.body.name;
       user.role = req.body.role;
 
-      jwt.verify(user.token, process.env.JWT_SECRET, (err, decodedToken) => {
+      jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
         if (err) {
           console.log(err.message);
         }
