@@ -41,7 +41,8 @@ router.route('/').get(async (req, res) => {
       count: result.length,
       page,
       pages,
-      data: filtered
+      data: filtered,
+      original: result,
     });
   } catch (error) {
     console.log(error);
