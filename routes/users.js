@@ -53,6 +53,16 @@ router.route('/').get(async (req, res) => {
   }
 });
 
+router.route('/login').post((req, res) => {
+  const email = req.body.email;
+  const name = req.body.name;
+  const role = req.body.role;
+
+  const user = new User({email, name, role});
+
+  res.json(jwt.sign({data: user}, process.env.JWT_SECRET));
+})
+
 // Adding users to database
 router.route('/add').post((req, res) => {
   const email = req.body.email;
@@ -61,8 +71,8 @@ router.route('/add').post((req, res) => {
 
   const newUser = new User({email, name, role});
 
-  const token = req.body.token;
-  jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+  const token = req.get('Authorization');
+  jwt.verify(token.split(' ')[1], process.env.JWT_SECRET, (err, decodedToken) => {
     if (err) {
       console.log(err.message);
     }
@@ -79,8 +89,8 @@ router.route('/add').post((req, res) => {
 // Delete users from database
 router.route('/:id').delete((req, res) => {
 
-  const token = req.body.token;
-  jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+  const token = req.get('Authorization');
+  jwt.verify(token.split(' ')[1], process.env.JWT_SECRET, (err, decodedToken) => {
     if (err) {
       console.log(err.message);
     }
@@ -94,7 +104,7 @@ router.route('/:id').delete((req, res) => {
 
 router.route('/update/:id').post((req, res) => {
 
-  const token = req.body.token;
+  const token = req.get('Authorization');
 
   User.findById(req.params.id)
     .then(user => {
@@ -102,7 +112,7 @@ router.route('/update/:id').post((req, res) => {
       user.name = req.body.name;
       user.role = req.body.role;
 
-      jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+      jwt.verify(token.split(' ')[1], process.env.JWT_SECRET, (err, decodedToken) => {
         if (err) {
           console.log(err.message);
         }
