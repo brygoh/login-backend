@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library')
 const client = new OAuth2Client(process.env.CLIENT_ID)
+const auth = require("../middleware/middleware");
 
 // Normal route to get whole database
 router.route('/').get(async (req, res) => {
@@ -75,64 +76,37 @@ router.route('/login').post(async (req, res) => {
 })
 
 // Adding users to database
-router.route('/add').post((req, res) => {
+router.route('/add').post(auth, (req, res) => {
   const email = req.body.email;
   const name = req.body.name;
   const role = req.body.role;
 
   const newUser = new User({email, name, role});
 
-  const token = req.get('Authorization');
-  jwt.verify(token.split(' ')[1], process.env.JWT_SECRET, (err, decodedToken) => {
-    if (err) {
-      console.log(err.message);
-    }
-    else {
-      newUser.save()
-        .then(() => {
-          res.json(token); 
-      })
-        .catch(err => res.status(400).json('Error: ' + err));
-    }
+  newUser.save()
+    .then(() => {
+      res.json('User Added'); 
   })
+    .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // Delete users from database
-router.route('/:id').delete((req, res) => {
-
-  const token = req.get('Authorization');
-  jwt.verify(token.split(' ')[1], process.env.JWT_SECRET, (err, decodedToken) => {
-    if (err) {
-      console.log(err.message);
-    }
-    else {
-      User.findByIdAndDelete(req.params.id)
-        .then(() => res.json('User deleted.'))
-        .catch(err => res.status(400).json('Error: ' + err));
-    }
-  })
+router.route('/:id').delete(auth, (req, res) => {
+  User.findByIdAndDelete(req.params.id)
+    .then(() => res.json('User deleted.'))
+    .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/update/:id').post((req, res) => {
-
-  const token = req.get('Authorization');
-
+router.route('/update/:id').post(auth, (req, res) => {
   User.findById(req.params.id)
     .then(user => {
       user.email = req.body.email;
       user.name = req.body.name;
       user.role = req.body.role;
 
-      jwt.verify(token.split(' ')[1], process.env.JWT_SECRET, (err, decodedToken) => {
-        if (err) {
-          console.log(err.message);
-        }
-        else {
-          user.save()
-            .then(() => res.json('User updated!'))
-            .catch(err => res.status(400).json('Error: ' + err));
-        }
-      })
+      user.save()
+        .then(() => res.json('User updated!'))
+        .catch(err => res.status(400).json('Error: ' + err));
     })
     .catch(err => res.status(400).json('Error: ' + err));
 });
