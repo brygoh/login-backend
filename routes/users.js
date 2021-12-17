@@ -6,7 +6,7 @@ const { OAuth2Client } = require('google-auth-library')
 const client = new OAuth2Client(process.env.CLIENT_ID)
 const auth = require("../middleware/middleware");
 
-// comment
+// comments
 // Normal route to get whole database
 router.route('/').get(async (req, res) => {
   try {
