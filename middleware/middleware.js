@@ -6,7 +6,7 @@ const authenticateToken = (req, res, next) => {
     if (authHeader) {
         jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET, (err, decodedToken) => {
             if (err) {
-                res.status(400).json('Error: ' + err);
+                console.log(err)
             }
             else {
                 next()
@@ -15,7 +15,7 @@ const authenticateToken = (req, res, next) => {
     }
     else {
         res.status(400).json('Error: ' + err);
-    }
+    }   
   }
 
   module.exports = authenticateToken;
