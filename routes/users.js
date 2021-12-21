@@ -1,14 +1,9 @@
 const router = require('express').Router();
 let User = require('../models/user.model.js');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const { OAuth2Client } = require('google-auth-library')
-const client = new OAuth2Client(process.env.CLIENT_ID)
 const auth = require("../middleware/middleware");
 
-// comment
 // Normal route to get whole database
-router.route('/').get(async (req, res) => {
+router.route('/').get(auth, async (req, res) => {
   try {
     let query = User.find();
 
@@ -56,25 +51,6 @@ router.route('/').get(async (req, res) => {
     });
   }
 });
-
-router.route('/login').post(async (req, res) => {
-  const email = req.body.email;
-  const name = req.body.name;
-  const role = req.body.role;
-  const token = req.get('Authorization');
-
-  const ticket = await client.verifyIdToken({
-      idToken: token.split(' ')[1],
-      audience: process.env.CLIENT_ID
-  });
-
-  const user = new User({email, name, role});
-
-  res.json({
-    verify:ticket.getPayload('email_verified'),
-    token:jwt.sign({data: user}, process.env.JWT_SECRET)
-  });
-})
 
 // Adding users to database
 router.route('/add').post(auth, (req, res) => {
