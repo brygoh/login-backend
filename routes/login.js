@@ -19,7 +19,8 @@ router.route('/').post(async (req, res) => {
         console.log('SUCCESS')
         res.json({
             verify:ticket.getPayload('email_verified'),
-            token:jwt.sign({data:search}, process.env.JWT_SECRET)
+            token:jwt.sign({data:search}, process.env.JWT_SECRET),
+            admin:search.role
         });
     }
     else {
