@@ -13,18 +13,31 @@ router.route('/').post(async (req, res) => {
         audience: process.env.CLIENT_ID
     });
 
-    let search = await User.findOne({'email':email})
+    console.log(ticket)
 
-    if (search) {
-        console.log('SUCCESS')
-        res.json({
-            verify:ticket.getPayload('email_verified'),
-            token:jwt.sign({data:search}, process.env.JWT_SECRET),
-            admin:search.role
-        });
+    if (ticket) {
+        let search = await User.findOne({'email':email})
+
+        if (search) {
+            console.log('SUCCESS')
+            res.json({
+                verify:ticket.getPayload('email_verified'),
+                token:jwt.sign({data:search}, process.env.JWT_SECRET),
+                admin:search.role
+            });
+        }
+        else {
+            console.log('FAILURE')
+            res.json({
+                admin:'DONOTEXIST'
+            });
+        }
     }
     else {
         console.log('FAILURE')
+        res.json({
+            admin:'DONOTEXIST'
+        });
     }
 })
 
