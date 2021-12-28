@@ -22,7 +22,7 @@ router.route('/').get(auth, async (req, res) => {
     }
 
     let result = await query;
-    let filtered = result.filter(target => {
+    let filtered = await result.filter(target => {
       if (filter.filter === "") {
         return target;
       }
@@ -32,15 +32,15 @@ router.route('/').get(auth, async (req, res) => {
       else if (target.email.toLowerCase().includes(filter.filter)){
         return target;
       }
-    }).slice(skip, skip+pageSize);
-    
+    });
+
     res.json({
       status: "success",
       filter,
       count: result.length,
       page,
-      pages,
-      data: filtered,
+      pages: Math.ceil(filtered.length / pageSize),
+      data: filtered.slice(skip, skip+pageSize),
       original: result,
     });
   } catch (error) {
