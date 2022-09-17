@@ -1,10 +1,17 @@
 # Tech-Stack
 
-ReactJS / Javascript / CSS
+NodeJS / MongoDB
 
 # Overview
 
-This depicts a simple webpage interface that allows user to login with their Google Account
+Simple backend that stores user data on MongoDB. Able to add, edit and delete.<br/>
+```
+Schema: {
+  email: string
+  name: string
+  role: string
+}
+```
 
 # Description
 
