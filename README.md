@@ -1,30 +1,23 @@
-# Tech-Stack
+# Login with Admin Dashboard
+It is a web application with supports login and admin dashboard.
 
-NodeJS / MongoDB
+# Project Description
+Users can login using their google account and only added users that exist in the server can login. There is separation of duties, only admins are able to view the admin dashboard.
 
-# Overview
+This project is built using **NodeJS** and database using **MongoDB**
 
-Simple backend that stores user data on MongoDB. Able to add, edit and delete.<br/>
 ```
-Schema: {
+user: {
   email: string
   name: string
   role: string
 }
 ```
 
-# Description
-
-Used Google Client API to authenticate valid Google Account <br />
-Used MongoDB to authenticate users' role by: useState, useEffect, axios.get... etc
-
-- Users have two roles: Admin and Normal (Non-Admin)
-- Webpage supposedly has successful login landing page for both admin and non admin users
-- Webpage supposedly has login failure login landing page for both admin and non admin users
-
+# How to Install and Run the Project
 - clone the project with:
 ```
-git clone https://github.com/brygoh/login-backend name OR
+git clone https://github.com/brygoh/login-frontend name OR
 download zip
 ```
 - open project on Visual Studio Code
