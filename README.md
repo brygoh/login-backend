@@ -17,7 +17,7 @@ user: {
 # How to Install and Run the Project
 - clone the project with:
 ```
-git clone https://github.com/brygoh/login-frontend name OR
+git clone https://github.com/brygoh/login-backend name OR
 download zip
 ```
 - open project on Visual Studio Code
