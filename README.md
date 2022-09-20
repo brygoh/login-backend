@@ -25,7 +25,7 @@ download zip
 ```
 npm install
 ```
-- npm start on terminal in main directory
+- nodemon server on terminal in main directory
 ```
 nodemon server
 ```
